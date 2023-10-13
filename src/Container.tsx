@@ -1,4 +1,4 @@
-import React from 'react';
+//import React from 'react';
 import "./Container.css";
 import {dualPointCrossover} from "./utils/crossover/Crossover";
 import {getInterval} from "./utils/interval/Interval";

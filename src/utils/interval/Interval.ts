@@ -4,7 +4,7 @@ function countDecimalPlaces(number: number): number {
 }
 
 export function getInterval(minimum: number, maximum: number, precision: number) {
-    const length = Math.abs(minimum + maximum);
+    const length = maximum - minimum;
     const count = (length / precision) + 1;
 
     const interval: number[] = [];

@@ -3,16 +3,17 @@
 * https://medium.com/geekculture/crossover-operators-in-ga-cffa77cdd0c8
 */
 
-function getRandomInt(min: number, max: number) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+
+import {getRandomInt} from "../random/Uniform";
 
 export function singlePointCrossover(
     parent1: number[],
     parent2: number[],
 ) {
+    console.log(parent1)
+    console.log(parent2)
+    console.log("!!!!!!!!!!!!!!!!!!!!!"+parent1.length)
+    console.log("!!!!!!!!!!!!!!!!!!!!!"+parent2.length)
     if (parent1.length !== parent2.length) {
         throw new Error("SinglePointCrossover: parents must have the same length");
     }

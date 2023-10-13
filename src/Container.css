@@ -2,7 +2,8 @@
     color: cyan;
     background: darkblue;
     text-align: center;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    display: block;
+    display: flex;
+    justify-content: center; /* Горизонтальное выравнивание по центру */
+    flex-direction: column;
+    margin-bottom: 20px;
 }

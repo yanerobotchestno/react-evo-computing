@@ -15,7 +15,7 @@
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: 50vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -38,12 +38,36 @@
 }
 
 .FunctionChart {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 50%;
-  height: 50%;
   background: white;
-  display: block;
+  display: flex;
+  justify-content: center; /* Горизонтальное выравнивание по центру */
+  align-items: center; /* Вертикальное выравнивание по центру */
+  position: relative;
+  flex-direction: column;
+  margin-bottom: 20px;
+  min-height: 400px; /* Минимальная высота контейнера (пример) */
 }
+
+.chart-container {
+  position: absolute;
+  min-height: 300px; /* Минимальная высота контейнера */
+  min-width: 600px; /* Минимальная ширина контейнера */
+  text-align: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.chart-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%; /* Заполнить доступное пространство внутри .chart-container */
+  max-width: 80%; /* Установите максимальную ширину по вашему усмотрению */
+  margin: 0 auto; /* Центрировать по горизонтали */
+}
+
+
 

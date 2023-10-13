@@ -16,7 +16,7 @@ export function normalDistribution(currentValue: number, mean: number, stdDev: n
     return coefficient * Math.exp(exponent);
 }
 
-export function randomUniformArray(minimum: number, maximum: number, numPoints: number) {
+export function randomNormalisemArray(minimum: number, maximum: number, numPoints: number) {
     const currentValues: number[] = [];
     const pdfValue: number[] = [];
     //среднее значение
