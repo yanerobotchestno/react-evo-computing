@@ -11,10 +11,7 @@ const rootElement = document.getElementById('root');
 
 createRoot(rootElement!).render(
     <React.Fragment>
-            <App />
-
-            <Container />
-        <Genetic></Genetic>
+          <App/>
     </React.Fragment>
 );
 

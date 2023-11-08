@@ -11,6 +11,43 @@ const bitsInByte = 8;
  * @param {number} byteLength - number of bytes to use to store the float number.
  * @return {string} - binary string representation of the float number.
  */
+
+export function decreaseToSmallestDecimal(numb:number) {
+    if (numb === 0) {
+        return 1;
+    }
+
+    let smallestDecimal = 1;
+
+    let decimalPlaces = (Math.abs(numb).toString().split('.')[1] || '').length;
+
+    while (decimalPlaces > 0) {
+        numb *= 10;
+        smallestDecimal *= 10;
+        decimalPlaces--;
+    }
+
+    return 1 / (smallestDecimal * 10);
+}
+
+
+export function getSmallestDecimal(num:number) {
+    // Преобразовываем число в строку
+    const numberStr = num.toString();
+
+    // Ищем индекс десятичной точки
+    const decimalPointIndex = numberStr.indexOf('.');
+
+    if (decimalPointIndex !== -1) {
+        // Если десятичная точка найдена, вычисляем количество нулей после точки
+        const zerosAfterDecimal = numberStr.length - decimalPointIndex - 1;
+        return Math.pow(0.1, zerosAfterDecimal);
+    } else {
+        // Если нет десятичной точки, разряд равен 1
+        return 1;
+    }
+}
+
 function floatAsBinaryString(floatNumber: number, byteLength: number): string {
     let numberAsBinaryString = '';
 

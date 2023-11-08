@@ -1,11 +1,11 @@
-import {randomNormalisemArray} from "../utils/random/NormalDistribution";
+import {randomNormaliseArray} from "../utils/random/NormalDistribution";
 import {Line} from "react-chartjs-2";
 import React from "react";
 import "./DistributionChart.css";
 import {getInterval} from "../utils/interval/Interval";
 
 const interval = getInterval(-10,10, 0.01);
-const pdfArr = randomNormalisemArray(-10, 10, interval.length);
+const pdfArr = randomNormaliseArray(-10, 10, interval.length);
 const labelsX = pdfArr.currentValues.map(number => {
     // Преобразуем число в строку с фиксированной точностью и затем в число
     return Number(number.toFixed(3));
