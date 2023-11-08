@@ -5,7 +5,7 @@ import {
     Form,
     Dropdown,
     Image,
-    Accordion, Button
+    Accordion, Button, ProgressBar
 } from "react-bootstrap";
 import "./GeneticAlghorithm.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -29,27 +29,26 @@ import {normaliseArray} from "../../utils/random/NormalDistribution";
 import {CalculatedPopulation} from "../../utils/fitness/Fitness";
 
 
-
-
 export default function GeneticAlghorithm() {
-    const [populationSize, setPopulationSize] = useState('300');
+    const [populationSize, setPopulationSize] = useState('3');
     const [constraintsMinimum, setConstraintsMinimum] = useState('-10');
     const [constraintsMaximum, setConstraintsMaximum] = useState('10');
     const [precision, setPrecision] = useState('0.0001');
-    const [arrayRandomFunction, setArrayRandomFunction] = useState('');
-    const [testFunction, setTestFunction] = useState('');
-    const [selectionFunction, setSelectionFunction] = useState('');
-    const [crossoverFunction, setCrossoverFunction] = useState('');
-    const [mutationProbability, setMutationProbability] = useState('');
-    const [crossoverProbability, setCrossoverProbability] = useState('');
-    const [inversionProbability, setInversionProbability] = useState('');
-    const [finalEpoch, setFinalEpoch] = useState('');
-    const [distance, setDistance] = useState('');
-    const [inversionFunctionName, setInversionFunction] = useState('');
-    const [mutationFunctionName, setMutationFunction] = useState('');
-    const [populationPushingName, setPopulationPushing] = useState('');
-    const [stopFunctionName, setStopFunction] = useState('');
+    const [arrayRandomFunctionName, setArrayRandomFunctionName] = useState('Uniform');
+    const [testFunctionName, setTestFunctionName] = useState('Matyas');
+    const [selectionFunctionName, setSelectionFunctionName] = useState('Panmixia');
+    const [crossoverFunctionName, setCrossoverFunctionName] = useState('CrossoverSinglePoint');
+    const [mutationProbability, setMutationProbability] = useState('0.01');
+    const [crossoverProbability, setCrossoverProbability] = useState('0.01');
+    const [inversionProbability, setInversionProbability] = useState('0.1');
+    const [finalEpoch, setFinalEpoch] = useState('30');
+    const [distance, setDistance] = useState('0.5');
+    const [inversionFunctionName, setInversionFunctionName] = useState('Classic');
+    const [mutationFunctionName, setMutationFunctionName] = useState('Classic');
+    const [populationPushingName, setPopulationPushingName] = useState('Elite');
+    const [stopFunctionName, setStopFunctionName] = useState('epoch');
     const [resultString, setResultString] = useState('');
+    const [progress, setProgress] = useState(0);
     const handleKeyPress = (event: { key: string; preventDefault: () => void; }) => {
         // if (event.key === 'Enter') {
         //     event.preventDefault();
@@ -60,157 +59,170 @@ export default function GeneticAlghorithm() {
     };
 
 
-    const params = React.useRef({
-        populationSize: 300, //V
+    const getParams = React.useCallback(() => ({
+        populationSize: Number(populationSize), //V
         constraints: {
-            maximum: 10, //V
-            minimum: -10 //V
+            maximum: Number(constraintsMaximum), //V
+            minimum: Number(constraintsMinimum) //V
         },
-        arrayRandomFunction: uniformInteger, //V
-        precision: 0.001, //V
-        fitnessFunction: matyasFunction, //V
-        selectionFunction: selection, //V
-        crossoverFunction: crossoverSinglePoint, //v
-        mutationProbability: 0.5, //V
-        crossoverProbability: 0.5, //V
-        inversionProbability: 0.5, //V
-        finalEpoch: 30, //V
-        distance: 1, //V
-        inversionFunction: inversionOperator, //V
-        mutationFunction: mutation, //V
-        populationPushing: selectionWithReplacement, //V
-        stopFunction: justEpoch
-    });
+        arrayRandomFunction: getArrayRandomFunction(arrayRandomFunctionName), //V
+        precision: Number(precision), //V
+        fitnessFunction: getTestFunction(testFunctionName), //V
+        selectionFunction: getSelectionFunction(selectionFunctionName), //V
+        crossoverFunction: getCrossoverFunction(crossoverFunctionName), //v
+        mutationProbability: Number(mutationProbability), //V
+        crossoverProbability: Number(crossoverProbability), //V
+        inversionProbability: Number(inversionProbability), //V
+        finalEpoch: Number(finalEpoch), //V
+        distance: Number(distance), //V
+        inversionFunction: getInversionFunction(inversionFunctionName), //V
+        mutationFunction: getMutationFunction(mutationFunctionName), //V
+        populationPushing: getPopulationPushingFunction(populationPushingName), //V
+        stopFunction: getStopFunction(stopFunctionName)
+    }), [arrayRandomFunctionName, constraintsMaximum, constraintsMinimum, crossoverFunctionName, crossoverProbability, distance, finalEpoch, inversionFunctionName, inversionProbability, mutationFunctionName, mutationProbability, populationPushingName, populationSize, precision, selectionFunctionName, stopFunctionName, testFunctionName]);
 
-    const setGAResult = React.useCallback(()=>  {
-        const res = genAlgh(params.current);
-        let populationResult = res.population;
-        let fitnessResult = res.fitnessPopulation;
-        let intervalResult = res.interval;
-        setResultString(`Result: f(${intervalResult[populationResult.x[fitnessResult.minimum.index]]}, ${intervalResult[populationResult.y[fitnessResult.minimum.index]]}) = ${fitnessResult.minimum.value}`);
-    }, [params, setResultString]);
+    const setGAResult = React.useCallback(() => {
+        genAlgh(getParams(), setProgress).then((res) => {
+            let populationResult = res.population;
+            let fitnessResult = res.fitnessPopulation;
+            let intervalResult = res.interval;
+            setResultString(`Result: f(${intervalResult[populationResult.x[fitnessResult.minimum.index]]}, ${intervalResult[populationResult.y[fitnessResult.minimum.index]]}) = ${fitnessResult.minimum.value}`);
+        });
+    }, [getParams, setResultString]);
 
 
-    function stopFunctSwitch(name: string) {
+    function getStopFunction(name: string) {
         switch (name) {
             case "epoch": {
-                params.current.stopFunction = justEpoch;
-                break;
+                return justEpoch;
             }
 
             case "populationDistance": {
-                params.current.stopFunction = populationDistance;
-                break;
+                return populationDistance;
             }
 
             case "parentDistance": {
-                params.current.stopFunction = parentDistance;
-                break;
+                return parentDistance;
             }
 
             case "stopByIterationCount": {
-                params.current.stopFunction = stopByIterationCount;
-                break;
+                return stopByIterationCount;
+            }
+
+            default: {
+                return stopByIterationCount;
             }
         }
     }
 
-    function setIOperator(name: string) {
+    function getInversionFunction(name: string) {
         switch (name) {
             case "Classic": {
-                params.current.inversionFunction = inversionOperator;
-                break;
+                return inversionOperator;
+            }
+
+            default: {
+                return inversionOperator;
             }
         }
     }
 
-    function setMutationOperator(name: string) {
+    function getMutationFunction(name: string) {
         switch (name) {
             case "Classic": {
-                params.current.mutationFunction = mutation;
-                break;
+                return mutation;
+            }
+
+            default: {
+                return mutation;
             }
         }
     }
 
-    function setPopPushFunction(name: string) {
+    function getPopulationPushingFunction(name: string) {
         switch (name) {
             case "SelectionWithReplacement": {
-                params.current.populationPushing = selectionWithReplacement;
-                break;
+                return selectionWithReplacement;
             }
 
             case "Elite": {
-                params.current.populationPushing = elite;
-                break;
+                return elite;
+            }
+
+            default: {
+                return elite;
             }
         }
     }
 
-    function setARF(name: string) {
+    function getArrayRandomFunction(name: string) {
         switch (name) {
             case "Normal": {
-                params.current.arrayRandomFunction = normaliseArray;
-                break;
+                return normaliseArray;
             }
             case "Uniform": {
-                params.current.arrayRandomFunction = uniformInteger;
-                break;
+                return uniformInteger;
+            }
+            default: {
+                return uniformInteger;
             }
         }
     }
 
-    function setCF(name: string) {
+    function getCrossoverFunction(name: string) {
         switch (name) {
             case "CrossoverSinglePoint": {
-                params.current.crossoverFunction = crossoverSinglePoint;
-                break;
+                return crossoverSinglePoint;
             }
             case "CrossoverDualPoint": {
-                params.current.crossoverFunction = crossoverDualPoint;
-                break;
+                return crossoverDualPoint;
+            }
+
+            default: {
+                return crossoverSinglePoint;
             }
         }
     }
 
-    function setTF(name: string) {
+    function getTestFunction(name: string) {
         switch (name) {
             case "Matyas": {
-                params.current.fitnessFunction = matyasFunction;
-                break;
+                return matyasFunction;
             }
             case "Kubik": {
-                params.current.fitnessFunction = matyasFunction;
-                break;
+                return matyasFunction;
             }
 
             case "Rubik": {
-                params.current.fitnessFunction = matyasFunction;
-                break;
+                return matyasFunction;
+            }
+
+            default: {
+                return matyasFunction;
             }
         }
     }
 
 
-    function setSF(name: string) {
+    function getSelectionFunction(name: string) {
         switch (name) {
             case "Panmixia": {
-                params.current.selectionFunction = panmix;
-                break;
+                return panmix;
             }
             case "Outbreeding": {
-                params.current.selectionFunction = outBreedingEuclid;
-                break;
+                return outBreedingEuclid;
             }
 
             case "Inbreeding": {
-                params.current.selectionFunction = inBreedingEuclid;
-                break;
+                return inBreedingEuclid;
             }
 
             case "Selection": {
-                params.current.selectionFunction = selection;
-                break;
+                return selection;
+            }
+
+            default: {
+                return panmix;
             }
         }
     }
@@ -228,45 +240,78 @@ export default function GeneticAlghorithm() {
                                     <input
                                         type="number"
                                         onKeyDown={handleKeyPress}
-                                        defaultValue={300}
+                                        value={populationSize}
                                         onChange={(e) => {
                                             setPopulationSize(e.target.value);
-                                            params.current.populationSize = parseInt(populationSize, 10);
-                                            setPopulationSize(e.target.value);
-                                            params.current.populationSize = parseInt(populationSize, 10);
                                         }}/>
                                 </Form.Group>
                             </Form>
                         </Col>
-                        {populationSize}
-                        <br/>
-                        {parseInt(populationSize, 10)}
                     </Row>
-                    <Row>
-                        <Form className="cons-container">
-                            <Form.Group>
-                                <Form.Label><h3 style={{textAlign: "center"}}>Constraints</h3></Form.Label>
-                                <br/>
-                                <Form.Label>Minimum</Form.Label>
-                                <br/>
-                                <input
-                                    type="number"
-                                    onKeyDown={handleKeyPress}
-                                    defaultValue={300}
-                                    onChange={(e) => setConstraintsMinimum(e.target.value)}/>
-                                Minimum:{constraintsMinimum}<br/>
-                                <Form.Label>Maximum</Form.Label>
-                                <br/>
-                                <input
-                                    type="number"
-                                    onKeyDown={handleKeyPress}
-                                    defaultValue={300}
-                                    onChange={(e) => setConstraintsMaximum(e.target.value)}/>
-                                Maximum:{constraintsMaximum};
-                            </Form.Group>
-                        </Form>
+                    <Row fluid md="auto">
+                        <Col md="auto">
+                            <Form className="cons-container">
+                                <Form.Group>
+                                    <Form.Label><h3 style={{textAlign: "center"}}>Constraints</h3></Form.Label>
+                                    <br/>
+                                    <Form.Label>Minimum</Form.Label>
+                                    <br/>
+                                    <input
+                                        type="number"
+                                        onKeyDown={handleKeyPress}
+                                        defaultValue={-10}
+                                        onChange={(e) => setConstraintsMinimum(e.target.value)}/>
+                                    Minimum:{constraintsMinimum}<br/>
+                                    <Form.Label>Maximum</Form.Label>
+                                    <br/>
+                                    <input
+                                        type="number"
+                                        onKeyDown={handleKeyPress}
+                                        defaultValue={10}
+                                        onChange={(e) => setConstraintsMaximum(e.target.value)}/>
+                                    Maximum:{constraintsMaximum};
+                                </Form.Group>
+                            </Form>
+                        </Col>
+                        <Col className="array-random-function">
+                            <Col>
+                                <>
+                                    <Form.Label><h3>Array random function</h3></Form.Label>
+
+                                    <Accordion>
+                                        <Accordion.Item eventKey="0">
+                                            <Accordion.Header>Distribution types</Accordion.Header>
+                                            <Accordion.Body>
+                                                <Image style={{width: "100%", height: "100%"}}
+                                                       src="https://rovdownloads.com/blog/wp-content/uploads/2014/06/PROBABILITY-DISTRIBUTIONS-MOST-COMMONLY-USED.png"></Image>
+                                            </Accordion.Body>
+                                        </Accordion.Item>
+                                    </Accordion>
+
+                                    <Dropdown>
+                                        <Form.Label>Selected: {arrayRandomFunctionName}</Form.Label>
+                                        <br/>
+                                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                                            Array random function
+                                        </Dropdown.Toggle>
+
+                                        <br></br>
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item type="button" onClick={(e) => {
+                                                setArrayRandomFunctionName('Uniform');
+
+                                            }}>Uniform</Dropdown.Item>
+                                            <Dropdown.Item type="button" onClick={(e) => {
+                                                setArrayRandomFunctionName('Normal');
+                                            }}>Normal</Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                </>
+                            </Col>
+                        </Col>
                     </Row>
-                    <Row>
+
+                    <Row className="precision-window">
                         <Form.Group>
                             <Form.Label>
                                 <h3 style={{textAlign: "center"}}>Precision</h3>
@@ -282,49 +327,12 @@ export default function GeneticAlghorithm() {
                             {precision}
                         </Form.Group>
                     </Row>
-                    <Row>
-                        <Col>
-                            <>
-                                <Form.Label><h3>Array random function</h3></Form.Label>
 
-                                <Accordion>
-                                    <Accordion.Item eventKey="0">
-                                        <Accordion.Header>Distribution types</Accordion.Header>
-                                        <Accordion.Body>
-                                            <Image style={{width: "100%", height: "100%"}}
-                                                   src="https://rovdownloads.com/blog/wp-content/uploads/2014/06/PROBABILITY-DISTRIBUTIONS-MOST-COMMONLY-USED.png"></Image>
-                                        </Accordion.Body>
-                                    </Accordion.Item>
-                                </Accordion>
-
-                                <Dropdown>
-                                    <Form.Label>Selected: {arrayRandomFunction}</Form.Label>
-                                    <br/>
-                                    <Dropdown.Toggle variant="success" id="dropdown-basic">
-                                        Array random function
-                                    </Dropdown.Toggle>
-
-                                    <br></br>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item type="button" onClick={(e) => {
-                                            setArrayRandomFunction('Uniform');
-                                            setARF(arrayRandomFunction);
-
-                                        }}>Uniform</Dropdown.Item>
-                                        <Dropdown.Item type="button" onClick={(e) => {
-                                            setArrayRandomFunction('Normal');
-                                            setARF(arrayRandomFunction);
-                                        }}>Normal</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </>
-                        </Col>
-                    </Row>
-                    <Row>
+                    <Row className="test-function-window">
                         <Col>
                             <Dropdown>
                                 <h3>Test Function</h3>
-                                <Form.Label>Selected: {testFunction}</Form.Label>
+                                <Form.Label>Selected: {testFunctionName}</Form.Label>
                                 <br/>
                                 <Dropdown.Toggle variant="success" id="dropdown-basic">
                                     Test Function
@@ -333,22 +341,19 @@ export default function GeneticAlghorithm() {
                                 <br></br>
                                 <Dropdown.Menu>
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setTestFunction('Matyas');
-                                        setTF(testFunction);
+                                        setTestFunctionName('Matyas');
                                     }}>
                                         Matyas
                                     </Dropdown.Item>
 
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setTestFunction('Kubik');
-                                        setTF(testFunction);
+                                        setTestFunctionName('Kubik');
                                     }}>
                                         Kubik
                                     </Dropdown.Item>
 
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setTestFunction('Tubik');
-                                        setTF(testFunction);
+                                        setTestFunctionName('Tubik');
                                     }}>
                                         Tubik
                                     </Dropdown.Item>
@@ -360,7 +365,7 @@ export default function GeneticAlghorithm() {
                         <Col className="SelectionFunction">
                             <Dropdown>
                                 <h3>Selection Function</h3>
-                                <Form.Label>Selected: {selectionFunction}</Form.Label>
+                                <Form.Label>Selected: {selectionFunctionName}</Form.Label>
                                 <br/>
                                 <Dropdown.Toggle variant="success" id="dropdown-basic">
                                     Selection Function
@@ -368,26 +373,22 @@ export default function GeneticAlghorithm() {
                                 <br></br>
                                 <Dropdown.Menu>
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setSelectionFunction('Panmixia');
-                                        setSF(selectionFunction);
+                                        setSelectionFunctionName('Panmixia');
                                     }}>Panmixia
                                     </Dropdown.Item>
 
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setSelectionFunction('Outbreeding');
-                                        setSF(selectionFunction);
+                                        setSelectionFunctionName('Outbreeding');
                                     }}>Outbreeding
                                     </Dropdown.Item>
 
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setSelectionFunction('Inbreeding');
-                                        setSF(selectionFunction);
+                                        setSelectionFunctionName('Inbreeding');
                                     }}>Inbreeding
                                     </Dropdown.Item>
 
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setSelectionFunction('Selection');
-                                        setSF(selectionFunction);
+                                        setSelectionFunctionName('Selection');
                                     }}>Selection
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
@@ -395,7 +396,7 @@ export default function GeneticAlghorithm() {
                         </Col>
                     </Row>
 
-                    <Row>
+                    <Row className="crossover-opt">
                         <Col>
                             <Dropdown>
                                 <Form.Group>
@@ -413,7 +414,7 @@ export default function GeneticAlghorithm() {
                                     {crossoverProbability}
                                 </Form.Group>
                                 <h3>Crossover Function</h3>
-                                <Form.Label>Selected: {crossoverFunction}</Form.Label>
+                                <Form.Label>Selected: {crossoverFunctionName}</Form.Label>
                                 <br/>
                                 <Dropdown.Toggle variant="success" id="dropdown-basic">
                                     Crossover Function
@@ -421,21 +422,19 @@ export default function GeneticAlghorithm() {
                                 <br></br>
                                 <Dropdown.Menu>
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setCrossoverFunction('CrossoverSinglePoint');
-                                        setCF(crossoverFunction);
+                                        setCrossoverFunctionName('CrossoverSinglePoint');
                                     }}>Single Point
                                     </Dropdown.Item>
 
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setCrossoverFunction('CrossoverDualPoint');
-                                        setCF(crossoverFunction);
+                                        setCrossoverFunctionName('CrossoverDualPoint');
                                     }}>Dual Point
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </Col>
                     </Row>
-                    <Row>
+                    <Row className="mutation-window">
                         <Form.Group>
                             <Form.Label>
                                 <h3 style={{textAlign: "center"}}>Mutation Probability</h3>
@@ -461,15 +460,14 @@ export default function GeneticAlghorithm() {
                                 <br></br>
                                 <Dropdown.Menu>
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setMutationFunction('Classic');
-                                        setMutationOperator(mutationFunctionName);
+                                        setMutationFunctionName('Classic');
                                     }}>Classic
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </Col>
                     </Row>
-                    <Row>
+                    <Row className="inversion-window">
                         <Form.Group>
                             <Form.Label>
                                 <h3 style={{textAlign: "center"}}>Inversion Probability</h3>
@@ -495,8 +493,7 @@ export default function GeneticAlghorithm() {
                                 <br></br>
                                 <Dropdown.Menu>
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setInversionFunction('Classic');
-                                        setIOperator(inversionFunctionName);
+                                        setInversionFunctionName('Classic');
                                     }}>Classic
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
@@ -504,7 +501,7 @@ export default function GeneticAlghorithm() {
                         </Col>
                     </Row>
 
-                    <Row>
+                    <Row className="epoch-window">
                         <Form.Group>
                             <Form.Label>
                                 <h3 style={{textAlign: "center"}}>Epoch Count</h3>
@@ -551,14 +548,12 @@ export default function GeneticAlghorithm() {
                                 <br></br>
                                 <Dropdown.Menu>
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setPopulationPushing('SelectionWithReplacement');
-                                        setPopPushFunction(populationPushingName);
+                                        setPopulationPushingName('SelectionWithReplacement');
                                     }}>Selection With Replacement
                                     </Dropdown.Item>
 
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setPopulationPushing('Elite');
-                                        setPopPushFunction(populationPushingName);
+                                        setPopulationPushingName('Elite');
                                     }}>Elite
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
@@ -578,36 +573,32 @@ export default function GeneticAlghorithm() {
                                 <br></br>
                                 <Dropdown.Menu>
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setStopFunction('epoch');
-                                        stopFunctSwitch(stopFunctionName);
+                                        setStopFunctionName('epoch');
                                     }}>Epoch
                                     </Dropdown.Item>
 
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setStopFunction('populationDistance');
-                                        stopFunctSwitch(stopFunctionName);
+                                        setStopFunctionName('populationDistance');
                                     }}>Distance between populations
                                     </Dropdown.Item>
 
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setStopFunction('parentDistance');
-                                        stopFunctSwitch(stopFunctionName);
+                                        setStopFunctionName('parentDistance');
                                     }}>ParentDistance
                                     </Dropdown.Item>
 
                                     <Dropdown.Item type="button" onClick={(e) => {
-                                        setStopFunction('stopByIterationCount');
-                                        stopFunctSwitch(stopFunctionName);
+                                        setStopFunctionName('stopByIterationCount');
                                     }}>StopByIterationCount
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </Col>
                     </Row>
-                </Container>
-                <Container>
                     <Row fluid>
                         <Button onClick={setGAResult}>Submit</Button>
+                        <br/>
+                        <ProgressBar animated min={0} max={Number(finalEpoch)} now={progress} style={{ marginTop: '10px' }} />
                     </Row>
                     <Row>
                         {resultString}

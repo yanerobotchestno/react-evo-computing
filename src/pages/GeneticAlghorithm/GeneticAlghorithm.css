@@ -28,3 +28,51 @@
     border-radius: 10px; /* Радиус скругления углов */
     padding: 10px; /* Отступ внутри блока */
 }
+
+.crossover-opt {
+    border: 2px solid #000; /* Толщина рамки и её цвет */
+    border-radius: 10px; /* Радиус скругления углов */
+    padding: 10px; /* Отступ внутри блока */
+}
+
+.precision-window {
+    border: 2px solid #000; /* Толщина рамки и её цвет */
+    border-radius: 10px; /* Радиус скругления углов */
+    padding: 10px; /* Отступ внутри блока */
+}
+
+.array-random-function {
+    border: 2px solid #000; /* Толщина рамки и её цвет */
+    border-radius: 10px; /* Радиус скругления углов */
+    padding: 10px; /* Отступ внутри блока */
+}
+
+.test-function-window {
+    border: 2px solid #000; /* Толщина рамки и её цвет */
+    border-radius: 10px; /* Радиус скругления углов */
+    padding: 10px; /* Отступ внутри блока */
+}
+
+.mutation-window {
+    border: 2px solid #000; /* Толщина рамки и её цвет */
+    border-radius: 10px; /* Радиус скругления углов */
+    padding: 10px; /* Отступ внутри блока */
+}
+
+.default {
+    border: 2px solid #000; /* Толщина рамки и её цвет */
+    border-radius: 10px; /* Радиус скругления углов */
+    padding: 10px; /* Отступ внутри блока */
+}
+
+.inversion-window {
+    border: 2px solid #000; /* Толщина рамки и её цвет */
+    border-radius: 10px; /* Радиус скругления углов */
+    padding: 10px; /* Отступ внутри блока */
+}
+
+.epoch-window {
+    border: 2px solid #000; /* Толщина рамки и её цвет */
+    border-radius: 10px; /* Радиус скругления углов */
+    padding: 10px; /* Отступ внутри блока */
+}
