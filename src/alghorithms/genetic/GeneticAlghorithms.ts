@@ -1,35 +1,16 @@
+import WebWorker from './worker/WebWorker';
+import workerApp from "./worker/WorkerApp";
+
 import {getInterval} from "../../utils/interval/Interval";
 import {CalculatedPopulation, calculatePopulationFitnessXY} from "../../utils/fitness/Fitness";
 import {chromosomeCrossover} from "../../utils/crossover/Crossover";
-import React from "react";
-
-
-export type GeneticOptions = {
-    populationSize: number,
-    randomizerFunction: (minimum: number, maximum: number, count: number) => number[],
-    crossoverProbability: number,
-    finalEpoh: number,
-    mutationProbability: number,
-    crossover: (a: number, b: number) => [number, number],
-    mutation: (mutationProbability: number, chromosome: number) => number,
-    inversion: (chromosome: number) => number,
-    debugMode: boolean
-}
-
-
-export type FunctionOptions = {
-    function: (x: number, y: number) => number,
-    minimum: number,
-    maximum: number,
-    precision: number
-}
-
+import {fnTime} from "../../utils/timings";
 
 export type Population = {
     x: number[],
-    y: number[]
+    y: number[],
+    precision: number
 }
-
 
 export type Chromosome = {
     x: number,
@@ -67,33 +48,48 @@ export type GeneticParams = {
     stopFunction: (epoch: number, currentEpoch: number, distance: number, population: Population, calculatedPopulation: CalculatedPopulation, newCalculatedPopulation: CalculatedPopulation) => boolean;
 }
 
+export type ChartData = {
+    minimum: number[],
+    populationIndex: number[]
+}
+
 export async function genAlgh(options: GeneticParams, progressSetter: (i: number) => void) {
+    let chartData: ChartData = {
+       minimum:[],
+        populationIndex: []
+    }
+
     //1. почат. мом. часу
     let epoch = 0;
     //2. генер. почат. попул.
     let interval = getInterval(options.constraints.minimum, options.constraints.maximum, options.precision);
-    console.log("INTERVAL", interval.length)
+    //console.log("INTERVAL", interval.length)
     let population: Population = {
         x: options.arrayRandomFunction(0, interval.length - 1, options.populationSize),
         y: options.arrayRandomFunction(0, interval.length - 1, options.populationSize),
+        precision: options.precision
     }
     //3. Вычислить приспособленность каждой особи
     let fitnessPopulation: CalculatedPopulation = {...calculatePopulationFitnessXY(interval, options.fitnessFunction, population)};
 
-    console.log("x")
-    console.log(population.x)
-    console.log("y")
-    console.log(population.y)
-    console.log(fitnessPopulation.fitnessPopulation);
-    console.log();
-    console.log(`minimum fitnessPopulation[${fitnessPopulation.minimum.index}] in population gives ${fitnessPopulation.minimum.value}`);
-    console.log(`maximum fitnessPopulation[${fitnessPopulation.maximum.index}] in population gives ${fitnessPopulation.maximum.value}`);
+    chartData.minimum.push(fitnessPopulation.minimum.value);
+    chartData.populationIndex.push(0);
+
+    // console.log("x")
+    // console.log(population.x)
+    // console.log("y")
+    // console.log(population.y)
+    // console.log(fitnessPopulation.calculatedPopulation);
+    // console.logf();
+    // console.log(`minimum fitnessPopulation[${fitnessPopulation.minimum.index}] in population gives ${fitnessPopulation.minimum.value}`);
+    // console.log(`maximum fitnessPopulation[${fitnessPopulation.maximum.index}] in population gives ${fitnessPopulation.maximum.value}`);
+
 
     while (epoch < options.finalEpoch) {
         progressSetter(epoch);
         await new Promise((rs) => setTimeout(rs, 0));
 
-        const newPopulation: Population = {x: [], y: []};
+        const newPopulation: Population = {x: [], y: [], precision: options.precision};
 
         let newPopulationFitness: number[] = [];
         let newPopulationMaximum: { value: number; index: number } = {value: Number.MIN_VALUE, index: 0};
@@ -101,30 +97,28 @@ export async function genAlgh(options: GeneticParams, progressSetter: (i: number
 
         while (newPopulation.x.length < options.populationSize) {
 
-            //Шаг 4. Выбрать особи
+            fnTime.countCycles++;
+
+
+            /*populationPushingName: string, fitnessFunctionName: string,
+              inversionFunctionName: string, mutationFunctionName: string, selectionFunctionName: string,
+              crossoverFunctionName: string, crossoverProbability: number, mutationProbability: number,
+`              population: Population, fitnessPopulation: CalculatedPopulation, interval: number[]*/
+            // const worker = WebWorker(workerApp);
+            // worker.postMessage({
+            //     populationPushingName: options.populationPushing.name,
+            //     fitnessFunctionName: options.fitnessFunction.name,
+            //     inversionFunctionName: options.inversionFunction.name,
+            //     mutationFunctionName: options.mutationFunction.name,
+            //     selectionFunctionName: options.selectionFunction.name,
+            //     crossoverFunctionName: options.crossoverFunction.name,
+            //     crossoverProbability: options.crossoverProbability,
+            //     mutationProbability: options.mutationProbability
+            //     , population, fitnessPopulation, interval
+            // });
+
+            //!!!!!!!!!!!!
             const selectedParents = options.selectionFunction(population, fitnessPopulation, interval);
-
-            // console.log()
-            // if (isNaN(options.fitnessFunction(interval[selectedParents[0].x], interval[selectedParents[0].y])) || isNaN(options.fitnessFunction(interval[selectedParents[1].x], interval[selectedParents[1].y]))) {
-            //     console.log(newPopulation.x.length)
-            //     console.log("NAN!!!!!!!!!!!");
-            //     console.log("____0_____")
-            //     console.log([selectedParents[0].x]);
-            //     console.log([selectedParents[0].y]);
-            //     console.log(interval[selectedParents[0].x]);
-            //     console.log(interval[selectedParents[0].y]);
-            //     console.log("____1_____")
-            //     console.log([selectedParents[1].x]);
-            //     console.log([selectedParents[1].y]);
-            //     console.log(interval[selectedParents[1].x]);
-            //     console.log(interval[selectedParents[1].y]);
-            // } else {
-            //     console.log(newPopulation.x.length)
-            //     console.log(`fitness(${interval[selectedParents[0].x]}, ${interval[selectedParents[0].y]}) = ${options.fitnessFunction(interval[selectedParents[0].x], interval[selectedParents[0].y])}`);
-            //     console.log(`fitness(${interval[selectedParents[1].x]}, ${interval[selectedParents[1].y]}) = ${options.fitnessFunction(interval[selectedParents[1].x], interval[selectedParents[1].y])}`);
-            // }
-            // console.log()
-
 
             const childIndex = (Math.random() <= 0.5) ? 0 : 1;
             const crossoverResult = (Math.random() < options.crossoverProbability) ? selectedParents[childIndex] : chromosomeCrossover(selectedParents, options.crossoverFunction)[childIndex];
@@ -151,6 +145,8 @@ export async function genAlgh(options: GeneticParams, progressSetter: (i: number
                 continue;
             }
 
+            ///!!!!!!!
+
             if (newPopulation.x.length !== newPopulation.y.length) {
                 throw Error("GeneticAlgorithm: x length exceeds y length")
             }
@@ -166,13 +162,15 @@ export async function genAlgh(options: GeneticParams, progressSetter: (i: number
             }
         }
 
-        if(!options.stopFunction(epoch, options.finalEpoch, options.distance, population, fitnessPopulation, fitnessPopulation = {
+
+        if (!options.stopFunction(epoch, options.finalEpoch, options.distance, population, fitnessPopulation, {
             minimum: newPopulationMinimum,
             maximum: newPopulationMaximum,
-            fitnessPopulation: newPopulationFitness
+            calculatedPopulation: newPopulationFitness,
+            sortedFitnessPopulation: [5, 2, 1]
         })
         ) {
-            epoch = options.finalEpoch;
+            break;
         }
 
         population = {...newPopulation};
@@ -180,23 +178,33 @@ export async function genAlgh(options: GeneticParams, progressSetter: (i: number
         fitnessPopulation = {
             minimum: newPopulationMinimum,
             maximum: newPopulationMaximum,
-            fitnessPopulation: newPopulationFitness
+            calculatedPopulation: newPopulationFitness,
+            sortedFitnessPopulation: [...newPopulationFitness].sort()
         };
 
+
+        chartData.minimum.push(fitnessPopulation.minimum.value);
+        chartData.populationIndex.push(epoch);
+        // console.log("fitnessPopulation.minimum.value", fitnessPopulation.minimum.value);
+        // console.log("epoch", epoch);
+
         epoch++;
-        console.log("EPOH", epoch)
+        //console.log("EPOH", epoch)
 
 
-        console.log("NEW POPULATION");
-        console.log(population)
-        console.log(fitnessPopulation.fitnessPopulation);
-        console.log();
-        console.log(`minimum fitnessPopulation[${fitnessPopulation.minimum.index}] in population gives ${fitnessPopulation.minimum.value}`);
-        // console.log(`fitness(${interval[population.x[fitnessPopulation.minimum.index]]}, ${interval[population.y[fitnessPopulation.minimum.index]]}) = ${options.fitnessFunction(interval[population.x[fitnessPopulation.minimum.index]], interval[population.y[fitnessPopulation.minimum.index]])}`);
-        console.log(`maximum fitnessPopulation[${fitnessPopulation.maximum.index}] in population gives ${fitnessPopulation.maximum.value}`);
+        // console.log("NEW POPULATION");
+        // console.log(population)
+        // console.log(fitnessPopulation.calculatedPopulation);
+        // console.log();
+        // console.log(`minimum fitnessPopulation[${fitnessPopulation.minimum.index}] in population gives ${fitnessPopulation.minimum.value}`);
+        // // console.log(`fitness(${interval[population.x[fitnessPopulation.minimum.index]]}, ${interval[population.y[fitnessPopulation.minimum.index]]}) = ${options.fitnessFunction(interval[population.x[fitnessPopulation.minimum.index]], interval[population.y[fitnessPopulation.minimum.index]])}`);
+        // console.log(`maximum fitnessPopulation[${fitnessPopulation.maximum.index}] in population gives ${fitnessPopulation.maximum.value}`);
     }
+
     progressSetter(options.finalEpoch);
 
-    return {population, fitnessPopulation, interval};
+    console.log(fnTime)
+
+    return {population, fitnessPopulation, interval, chartData};
 }
 

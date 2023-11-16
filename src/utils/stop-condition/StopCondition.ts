@@ -35,4 +35,5 @@ export function populationDistance(epoch: number, currentEpoch: number, distance
 
 export function justEpoch(epoch: number, currentEpoch: number, distance: number, population: Population, calculatedPopulation: CalculatedPopulation, newCalculatedPopulation: CalculatedPopulation): boolean {
     return true;
+    //return (newCalculatedPopulation.minimum.value < population.precision);
 }

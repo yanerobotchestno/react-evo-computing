@@ -12,7 +12,8 @@ export type CalculatedPopulation = {
         index: number
     },
 
-    fitnessPopulation: number[]
+    calculatedPopulation: number[],
+    sortedFitnessPopulation: number[]
 }
 
 export function calculatePopulationFitnessXY(interval: number[], fitness: (x: number, y: number) => number, population: Population): CalculatedPopulation {
@@ -48,7 +49,7 @@ export function calculatePopulationFitnessXY(interval: number[], fitness: (x: nu
         fitnessPopulation.push(result);
     }
 
-    return {minimum, maximum, fitnessPopulation}
+    return {minimum, maximum, calculatedPopulation: fitnessPopulation, sortedFitnessPopulation: [...fitnessPopulation].sort()}
 }
 
 //

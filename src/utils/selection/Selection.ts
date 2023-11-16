@@ -16,7 +16,7 @@ export function panmix(population: Population, calculatedPopulation: CalculatedP
     }]
 }
 
-export function outBreedingEuclid(population: Population, calculatedPopulation: CalculatedPopulation, interval: number[]): Chromosome[] {
+export function outBreedingEuclid(population: Population, calculatedPopulation: CalculatedPopulation, interval: number[]): [Chromosome, Chromosome] {
     if (population.x.length !== population.y.length) throw Error("OutBreedingEuclid: x and y length different");
 
     let elementIndex = randomNumberInRange(0, population.x.length - 1);
@@ -44,15 +44,15 @@ export function outBreedingEuclid(population: Population, calculatedPopulation: 
             }
 
             calculatedDistance = distance;
-            console.log("must grow", distance)
+            // console.log("must grow", distance)
         }
     }
 
-    console.log("FINDED!");
-    console.log(firstElement);
-    console.log(secondElement);
-    console.log(calculateEuclideanDistance(firstElement.x, firstElement.y, secondElement.x, secondElement.y));
-    console.log("OUTBREEDING")
+    // console.log("FINDED!");
+    // console.log(firstElement);
+    // console.log(secondElement);
+    // console.log(calculateEuclideanDistance(firstElement.x, firstElement.y, secondElement.x, secondElement.y));
+    // console.log("OUTBREEDING")
     // console.log(minimum);
     // console.log(calculateEuclideanDistance(firstElement.x, firstElement.y, minimum.x, minimum.y));
     // console.log(maximum);
@@ -63,7 +63,7 @@ export function outBreedingEuclid(population: Population, calculatedPopulation: 
 }
 
 
-export function inBreedingEuclid(population: Population, calculatedPopulation: CalculatedPopulation, interval: number[]): Chromosome[] {
+export function inBreedingEuclid(population: Population, calculatedPopulation: CalculatedPopulation, interval: number[]): [Chromosome, Chromosome] {
     if (population.x.length !== population.y.length) throw Error("InBreedingEuclid: x and y length different");
 
     let elementIndex = randomNumberInRange(0, population.x.length - 1);
@@ -90,20 +90,20 @@ export function inBreedingEuclid(population: Population, calculatedPopulation: C
             }
 
             calculatedDistance = distance;
-            console.log("must down", distance)
+            // console.log("must down", distance)
         }
     }
 
-    console.log("FINDED!");
-    console.log(firstElement);
-    console.log(secondElement);
-    console.log(calculateEuclideanDistance(firstElement.x, firstElement.y, secondElement.x, secondElement.y));
-    console.log("INBREEDING")
+    // console.log("FINDED!");
+    // console.log(firstElement);
+    // console.log(secondElement);
+    // console.log(calculateEuclideanDistance(firstElement.x, firstElement.y, secondElement.x, secondElement.y));
+    // console.log("INBREEDING")
 
     return [firstElement, secondElement]
 }
 
-export function selection(population: Population, calculatedPopulation: CalculatedPopulation, interval: number[]): Chromosome[] {
+export function selection(population: Population, calculatedPopulation: CalculatedPopulation, interval: number[]): [Chromosome, Chromosome] {
     const parent1: Chromosome = {
         x: population.x[calculatedPopulation.minimum.index],
         y: population.y[calculatedPopulation.minimum.index]
@@ -114,7 +114,7 @@ export function selection(population: Population, calculatedPopulation: Calculat
         y: population.y[0]
     };
 
-    let parent2Computed = calculatedPopulation.fitnessPopulation[0];
+    let parent2Computed = calculatedPopulation.calculatedPopulation[0];
 
     const mediumFitness = (calculatedPopulation.maximum.value + calculatedPopulation.minimum.value) / 2;
 
@@ -133,14 +133,14 @@ export function selection(population: Population, calculatedPopulation: Calculat
     // }
     let i = randomNumberInRange(0, population.x.length-1);
 
-    while(calculatedPopulation.fitnessPopulation[i] < mediumFitness){
+    while(calculatedPopulation.calculatedPopulation[i] < mediumFitness){
         if ((population.x[i] === parent1.x) && (population.y[i] === parent1.y)) {
             i = randomNumberInRange(0, population.x.length-1);
             continue;
         }
 
-        if (calculatedPopulation.fitnessPopulation[i] < mediumFitness) {
-            parent2Computed = calculatedPopulation.fitnessPopulation[i];
+        if (calculatedPopulation.calculatedPopulation[i] < mediumFitness) {
+            parent2Computed = calculatedPopulation.calculatedPopulation[i];
             parent2 = {
                 x: population.x[i],
                 y: population.y[i]
@@ -151,11 +151,11 @@ export function selection(population: Population, calculatedPopulation: Calculat
         i = randomNumberInRange(0, population.x.length-1);
     }
 
-    console.log("SELECTION")
-    console.log(interval[parent1.x])
-    console.log(interval[parent1.y])
-    console.log(interval[parent2.x])
-    console.log(interval[parent2.y])
+    // console.log("SELECTION")
+    // console.log(interval[parent1.x])
+    // console.log(interval[parent1.y])
+    // console.log(interval[parent2.x])
+    // console.log(interval[parent2.y])
 
     return [parent1, parent2];
 }
