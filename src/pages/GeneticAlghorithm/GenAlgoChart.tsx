@@ -13,13 +13,6 @@ import {AxisOptions, Chart} from 'react-charts';
 import ResizableBox from "./ResizableBox";
 
 
-
-
-
-
-
-
-
 export const GenAlgoChart = ({
                                  mutationProbability = 0.001,
                                  fitnessFunction = matyasFunction,
@@ -44,8 +37,8 @@ export const GenAlgoChart = ({
     const [result, setResult] = useState('');
     const [elapsedTime, setElapsedTime] = useState('0');
     const [chartData, setChartData] = useState({
-        minimum:[8],
-        populationIndex:[8]
+        minimum: [8],
+        populationIndex: [8]
     });
 
     useEffect(() => {
@@ -67,7 +60,8 @@ export const GenAlgoChart = ({
                 precision,
                 inversionProbability,
                 arrayRandomFunction,
-                     }, (n: number) => {});
+            }, (n: number) => {
+            });
 
             const end = window.performance.now();
             const populationResult = res.population;
@@ -83,10 +77,9 @@ export const GenAlgoChart = ({
     }, []);
 
 
-
-    const data:{
-        data:{
-            primary:number,
+    const data: {
+        data: {
+            primary: number,
             secondary: number,
             radius: number
         }[]
@@ -95,18 +88,18 @@ export const GenAlgoChart = ({
             data: []
         }
     ];
-    console.log("PopInd",chartData.populationIndex);
-    console.log("Min",chartData.minimum);
+    console.log("PopInd", chartData.populationIndex);
+    console.log("Min", chartData.minimum);
 
-    for (let i = 0; i < chartData.populationIndex.length ; i++) {
+    for (let i = 0; i < chartData.populationIndex.length; i++) {
         data[0].data.push({
             secondary: chartData.minimum[i],
             primary: chartData.populationIndex[i],
-            radius:4
+            radius: 4
         })
     }
 
-    const primaryAxis =  useMemo<
+    const primaryAxis = useMemo<
         AxisOptions<typeof data[number]["data"][number]>
     >(
         () => ({
@@ -115,7 +108,7 @@ export const GenAlgoChart = ({
         []
     );
 
-    const secondaryAxes =  useMemo<
+    const secondaryAxes = useMemo<
         AxisOptions<typeof data[number]["data"][number]>[]
     >(
         () => [
@@ -129,8 +122,8 @@ export const GenAlgoChart = ({
 
     return (<>
         <>
-            <br />
-            <br />
+            <br/>
+            <br/>
             <ResizableBox>
                 <Chart
                     options={{

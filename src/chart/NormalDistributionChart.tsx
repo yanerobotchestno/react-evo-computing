@@ -41,9 +41,9 @@ export const options = {
 
 export function DistributionChart() {
     return <>
-        <div className="DistributionChart">
+        <div className="sdf">
 
-                <div className="chart-content">
+                <div className="asfasf">
                     <Line options={options} data={data}/>
                 </div>
 

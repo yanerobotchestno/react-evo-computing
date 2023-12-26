@@ -69,7 +69,6 @@ export async function genAlgh(options: GeneticParams, progressSetter: (i: number
         y: options.arrayRandomFunction(0, interval.length - 1, options.populationSize),
         precision: options.precision
     }
-    //3. Вычислить приспособленность каждой особи
     let fitnessPopulation: CalculatedPopulation = {...calculatePopulationFitnessXY(interval, options.fitnessFunction, population)};
 
     chartData.minimum.push(fitnessPopulation.minimum.value);

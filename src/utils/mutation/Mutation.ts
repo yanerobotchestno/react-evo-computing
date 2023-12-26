@@ -7,7 +7,6 @@ export function mutation(chromosome: number): number {
     const mutatedChromosome = chromosome ^ bitPosition;
     const maxBitMask = (1 << maxBits) - 1;
     return mutatedChromosome & maxBitMask;
-
 }
 
 

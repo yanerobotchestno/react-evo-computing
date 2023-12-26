@@ -21,7 +21,7 @@ export function randomNormaliseArray(minimum: number, maximum: number, numPoints
     const pdfValue: number[] = [];
     //среднее значение
     const mean = findSymmetricValueInRange(0.0, minimum, maximum);
-    const stdDev = 1.0;
+    const stdDev = 0.4;
 
     for (let i = 0; i <= numPoints; i++) {
         const currentValue = normalValue(minimum, maximum, i, numPoints);

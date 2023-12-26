@@ -1,0 +1,29 @@
+ .ArrayTable {
+     display: flex;
+     margin: 0 auto;
+     justify-content: center;
+ }
+
+ .ArrayTable table {
+     justify-content: center;
+ }
+
+ .FlexTable {
+     margin: 0 auto;
+     justify-content: center;
+     text-align: center;
+ }
+
+ .Amatrix {
+     font-size: larger;
+     display: flex;
+     align-items: center;
+     flex-direction: row-reverse;
+ }
+
+ .X0Table {
+     font-size: larger;
+     display: flex;
+     align-items: center;
+     flex-direction: row-reverse;
+ }
